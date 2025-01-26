@@ -1,4 +1,4 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema } from 'mongoose'
 
 interface Card {
   name: string
@@ -24,15 +24,17 @@ const cardSchema = new Schema<Card>({
     ref: 'user',
     required: true,
   },
-  likes: [{
-    type: Schema.Types.ObjectId,
-    ref: 'user',
-    default: [],
-  }],
+  likes: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+      default: [],
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now(),
   },
-});
+})
 
-export default model<Card>('card', cardSchema);
+export default model<Card>('card', cardSchema)

@@ -1,4 +1,4 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema } from 'mongoose'
 
 interface User {
   name: string
@@ -23,6 +23,6 @@ const userSchema = new Schema<User>({
     type: String,
     required: true,
   },
-});
+})
 
-export default model<User>('user', userSchema);
+export default model<User>('user', userSchema)
