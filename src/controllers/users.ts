@@ -16,3 +16,9 @@ export const createUser = (req: Request, res: Response) =>
   })
     .then((user) => res.send(user))
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }))
+
+export const getUserById = (req: Request, res: Response) => {
+  User.findById(req.params.id)
+    .then((user) => res.send(user))
+    .catch(() => res.status(404).send({ message: 'Пользователь не найден' }))
+}
