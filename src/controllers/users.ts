@@ -22,3 +22,19 @@ export const getUserById = (req: Request, res: Response) => {
     .then((user) => res.send(user))
     .catch(() => res.status(404).send({ message: 'Пользователь не найден' }))
 }
+
+export const updateUserInfo = (req: Request, res: Response) => {
+  User.findByIdAndUpdate(req.params.id, req.body, { new: true, upsert: true })
+    .then((user) => res.send(user))
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }))
+}
+
+export const updateUserAvatar = (req: Request, res: Response) => {
+  User.findByIdAndUpdate(
+    req.params.id,
+    { avatar: req.body.avatar },
+    { new: true },
+  )
+    .then((user) => res.send(user))
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }))
+}
