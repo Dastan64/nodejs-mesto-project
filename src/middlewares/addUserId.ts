@@ -7,7 +7,7 @@ const addUserId = (
   next: NextFunction,
 ) => {
   res.locals.user = {
-    _id: '65ce3b5af85c5bc50f2b202c',
+    _id: '67961cc2b9c038c5cda4a317',
   }
   next()
 }

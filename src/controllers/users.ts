@@ -1,40 +1,105 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
+import { Error } from 'mongoose'
 import User from '../models/user'
+import { NotFoundError } from '../errors/not-found-error'
+import { ValidationError } from '../errors/validation-error'
+import { AuthContext } from '../types/types'
 
-export const getUsers = (req: Request, res: Response) =>
+export const getUsers = (_req: Request, res: Response, next: NextFunction) =>
   User.find({})
     .then((users) => res.send(users))
-    .catch((err) => {
-      res.status(500).send(err)
-    })
+    .catch(next)
 
-export const createUser = (req: Request, res: Response) =>
+export const createUser = (req: Request, res: Response, next: NextFunction) =>
   User.create({
     name: req.body.name,
     about: req.body.about,
     avatar: req.body.avatar,
   })
     .then((user) => res.send(user))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }))
+    .catch((err) => {
+      if (err instanceof Error.ValidationError) {
+        next(new ValidationError('Переданы некорректные данные'))
+      } else {
+        next(err)
+      }
+    })
 
-export const getUserById = (req: Request, res: Response) => {
+export const getUserById = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   User.findById(req.params.id)
-    .then((user) => res.send(user))
-    .catch(() => res.status(404).send({ message: 'Пользователь не найден' }))
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError(
+          'Пользователь с таким идентификатором не найден',
+        )
+      }
+      res.send(user)
+    })
+    .catch(next)
 }
 
-export const updateUserInfo = (req: Request, res: Response) => {
-  User.findByIdAndUpdate(req.params.id, req.body, { new: true, upsert: true })
-    .then((user) => res.send(user))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }))
+export const updateUserInfo = (
+  req: Request,
+  res: Response<unknown, AuthContext>,
+  next: NextFunction,
+) => {
+  User.findByIdAndUpdate(res.locals.user._id, req.body, {
+    new: true,
+    runValidators: true,
+  })
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError(
+          'Пользователь с таким идентификатором не найден',
+        )
+      }
+      res.send(user)
+    })
+    .catch((err) => {
+      if (err instanceof Error.CastError) {
+        next(new ValidationError('Некорректный тип данных'))
+      }
+      if (err instanceof Error.ValidationError) {
+        next(new ValidationError('Переданы некорректные данные'))
+      } else {
+        next(err)
+      }
+    })
 }
 
-export const updateUserAvatar = (req: Request, res: Response) => {
+export const updateUserAvatar = (
+  req: Request,
+  res: Response<unknown, AuthContext>,
+  next: NextFunction,
+) => {
   User.findByIdAndUpdate(
-    req.params.id,
+    res.locals.user._id,
     { avatar: req.body.avatar },
-    { new: true },
+    {
+      new: true,
+      runValidators: true,
+    },
   )
-    .then((user) => res.send(user))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }))
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError(
+          'Пользователь с таким идентификатором не найден',
+        )
+      }
+      res.send(user)
+    })
+    .catch((err) => {
+      if (err instanceof Error.CastError) {
+        next(new ValidationError('Некорректный тип данных'))
+      }
+      if (err instanceof Error.ValidationError) {
+        next(new ValidationError('Переданы некорректные данные'))
+      } else {
+        next(err)
+      }
+    })
 }

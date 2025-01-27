@@ -4,6 +4,7 @@ import mongoose from 'mongoose'
 import usersRouter from './routes/users'
 import cardsRouter from './routes/cards'
 import addUserId from './middlewares/addUserId'
+import { handleError } from './middlewares/catchError'
 
 const { PORT = 3000 } = process.env
 
@@ -21,6 +22,8 @@ app.use(addUserId)
 
 app.use('/users', usersRouter)
 app.use('/cards', cardsRouter)
+
+app.use(handleError)
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`)
