@@ -20,7 +20,7 @@ export const createCard = (
     link: req.body.link,
     owner: res.locals.user._id,
   })
-    .then((card) => res.send(card))
+    .then((card) => res.status(201).send(card))
     .catch((err) => {
       if (err instanceof Error.ValidationError) {
         next(new ValidationError('Переданы некорректные данные'))

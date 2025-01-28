@@ -16,7 +16,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) =>
     about: req.body.about,
     avatar: req.body.avatar,
   })
-    .then((user) => res.send(user))
+    .then((user) => res.status(201).send(user))
     .catch((err) => {
       if (err instanceof Error.ValidationError) {
         next(new ValidationError('Переданы некорректные данные'))
