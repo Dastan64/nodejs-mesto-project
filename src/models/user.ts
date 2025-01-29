@@ -53,27 +53,30 @@ const userSchema = new Schema<IUser, UserModel>({
   password: {
     type: String,
     required: true,
+    select: false,
   },
 })
 
 userSchema.static(
   'findUserByCredentials',
   function findUserByCredentials(email: string, password: string) {
-    return this.findOne({ email }).then((user) => {
-      if (!user) {
-        throw new AuthError('Неправильные почта или пароль')
-      }
+    return this.findOne({ email })
+      .select('+password')
+      .then((user) => {
+        if (!user) {
+          throw new AuthError('Неправильные почта или пароль')
+        }
 
-      return bcrypt
-        .compare(password, user.password)
-        .then((hasMatch: boolean) => {
-          if (!hasMatch) {
-            throw new AuthError('Неправильные почта или пароль')
-          }
+        return bcrypt
+          .compare(password, user.password)
+          .then((hasMatch: boolean) => {
+            if (!hasMatch) {
+              throw new AuthError('Неправильные почта или пароль')
+            }
 
-          return user
-        })
-    })
+            return user
+          })
+      })
   },
 )
 
