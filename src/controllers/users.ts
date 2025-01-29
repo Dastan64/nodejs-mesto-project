@@ -1,29 +1,67 @@
 import { NextFunction, Request, Response } from 'express'
 import { Error } from 'mongoose'
+import bcrypt from 'bcrypt'
 import User from '../models/user'
 import { NotFoundError } from '../errors/not-found-error'
 import { ValidationError } from '../errors/validation-error'
 import { AuthContext } from '../types/types'
+import { AuthError } from '../errors/auth-error'
+import { ErrorCodes } from '../constants/errors'
 
 export const getUsers = (_req: Request, res: Response, next: NextFunction) =>
   User.find({})
     .then((users) => res.send(users))
     .catch(next)
 
-export const createUser = (req: Request, res: Response, next: NextFunction) =>
-  User.create({
-    name: req.body.name,
-    about: req.body.about,
-    avatar: req.body.avatar,
-  })
+export const login = (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body
+
+  return User.findOne({ email })
+    .then((user) => {
+      if (!user) {
+        throw new AuthError('Неправильные почта или пароль')
+      }
+
+      return bcrypt.compare(password, user.password)
+    })
+    .then((hasMatch: boolean) => {
+      if (!hasMatch) {
+        throw new AuthError('Неправильные почта или пароль')
+      }
+
+      res.send({ message: 'Авторизация успешна!' })
+    })
+    .catch((err: unknown) => {
+      if (err instanceof AuthError) {
+        res.status(ErrorCodes.NOT_AUTHORIZED).send({ message: err.message })
+      } else {
+        next(err)
+      }
+    })
+}
+
+export const createUser = (req: Request, res: Response, next: NextFunction) => {
+  const { name, about, avatar, email, password } = req.body
+  bcrypt
+    .hash(password, 10)
+    .then((hash: string) => {
+      User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      })
+    })
     .then((user) => res.status(201).send(user))
-    .catch((err) => {
+    .catch((err: unknown) => {
       if (err instanceof Error.ValidationError) {
         next(new ValidationError('Переданы некорректные данные'))
       } else {
         next(err)
       }
     })
+}
 
 export const getUserById = (
   req: Request,
