@@ -16,21 +16,8 @@ export const getUsers = (_req: Request, res: Response, next: NextFunction) =>
 export const login = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body
 
-  return User.findOne({ email })
-    .then((user) => {
-      if (!user) {
-        throw new AuthError('Неправильные почта или пароль')
-      }
-
-      return bcrypt.compare(password, user.password)
-    })
-    .then((hasMatch: boolean) => {
-      if (!hasMatch) {
-        throw new AuthError('Неправильные почта или пароль')
-      }
-
-      res.send({ message: 'Авторизация успешна!' })
-    })
+  return User.findUserByCredentials(email, password)
+    .then(() => res.send({ message: 'Авторизация успешна!' }))
     .catch((err: unknown) => {
       if (err instanceof AuthError) {
         res.status(ErrorCodes.NOT_AUTHORIZED).send({ message: err.message })
