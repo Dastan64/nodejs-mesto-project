@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { Error } from 'mongoose'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 import User from '../models/user'
 import { NotFoundError } from '../errors/not-found-error'
 import { ValidationError } from '../errors/validation-error'
@@ -17,7 +18,18 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body
 
   return User.findUserByCredentials(email, password)
-    .then(() => res.send({ message: 'Авторизация успешна!' }))
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'secret-key', {
+        expiresIn: '3h',
+      })
+      res
+        .cookie('jwt', token, {
+          maxAge: 10800000,
+          httpOnly: true,
+          sameSite: true,
+        })
+        .send({ message: 'Авторизация успешна' })
+    })
     .catch((err: unknown) => {
       if (err instanceof AuthError) {
         res.status(ErrorCodes.NOT_AUTHORIZED).send({ message: err.message })

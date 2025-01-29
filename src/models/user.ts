@@ -3,7 +3,7 @@ import isEmail from 'validator/es/lib/isEmail'
 import bcrypt from 'bcrypt'
 import { AuthError } from '../errors/auth-error'
 
-export interface User {
+export interface IUser {
   name: string
   about: string
   avatar: string
@@ -11,14 +11,14 @@ export interface User {
   password: string
 }
 
-interface UserModel extends Model<User> {
+interface UserModel extends Model<IUser> {
   findUserByCredentials: (
     email: string,
     password: string,
-  ) => Promise<Document<unknown, any, User>>
+  ) => Promise<Document<unknown, any, IUser>>
 }
 
-const userSchema = new Schema<User, UserModel>({
+const userSchema = new Schema<IUser, UserModel>({
   name: {
     type: String,
     required: true,
@@ -77,4 +77,4 @@ userSchema.static(
   },
 )
 
-export default model<User, UserModel>('user', userSchema)
+export default model<IUser, UserModel>('user', userSchema)
