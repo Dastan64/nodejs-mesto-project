@@ -3,4 +3,7 @@ export enum ErrorCodes {
   VALIDATION_ERROR = 400,
   SERVER_ERROR = 500,
   NOT_AUTHORIZED = 401,
+  CONFLICT = 409,
 }
+
+export const MONGO_DUPLICATE_ERROR = 11000

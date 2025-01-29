@@ -7,7 +7,8 @@ import { NotFoundError } from '../errors/not-found-error'
 import { ValidationError } from '../errors/validation-error'
 import { AuthContext } from '../types/types'
 import { AuthError } from '../errors/auth-error'
-import { ErrorCodes } from '../constants/errors'
+import { ErrorCodes, MONGO_DUPLICATE_ERROR } from '../constants/errors'
+import { ConflictError } from '../errors/conflict-error'
 
 export const getUsers = (_req: Request, res: Response, next: NextFunction) =>
   User.find({})
@@ -43,19 +44,24 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
   const { name, about, avatar, email, password } = req.body
   bcrypt
     .hash(password, 10)
-    .then((hash: string) => {
+    .then((hash: string) =>
       User.create({
         name,
         about,
         avatar,
         email,
         password: hash,
-      })
-    })
+      }),
+    )
     .then((user) => res.status(201).send(user))
     .catch((err: unknown) => {
       if (err instanceof Error.ValidationError) {
         next(new ValidationError('Переданы некорректные данные'))
+      } else if (
+        err instanceof Error &&
+        err.message.includes(String(MONGO_DUPLICATE_ERROR))
+      ) {
+        next(new ConflictError('Пользователь с таким email уже существует'))
       } else {
         next(err)
       }
