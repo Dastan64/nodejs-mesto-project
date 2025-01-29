@@ -20,7 +20,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'secret-key', {
-        expiresIn: '3h',
+        expiresIn: '7d',
       })
       res
         .cookie('jwt', token, {
