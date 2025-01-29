@@ -6,6 +6,7 @@ import cardsRouter from './routes/cards'
 import addUserId from './middlewares/addUserId'
 import { handleError } from './middlewares/handleError'
 import { NotFoundError } from './errors/not-found-error'
+import { auth } from './middlewares/auth'
 
 const { PORT = 3000 } = process.env
 
@@ -28,6 +29,7 @@ app.use((_req: Request, _res: Response, next: NextFunction) => {
   next(new NotFoundError('Маршрут не найден'))
 })
 
+app.use(auth)
 app.use(handleError)
 
 app.listen(PORT, () => {
