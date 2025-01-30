@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { Error } from 'mongoose'
+import { Error as MongooseError } from 'mongoose'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import User from '../models/user'
@@ -55,7 +55,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
     )
     .then((user) => res.status(201).send(user))
     .catch((err: unknown) => {
-      if (err instanceof Error.ValidationError) {
+      if (err instanceof MongooseError.ValidationError) {
         next(new ValidationError(err.message))
       } else if (
         err instanceof Error &&
@@ -103,10 +103,10 @@ export const updateUserInfo = (
       res.send(user)
     })
     .catch((err) => {
-      if (err instanceof Error.CastError) {
+      if (err instanceof MongooseError.CastError) {
         next(new ValidationError('Некорректный тип данных'))
       }
-      if (err instanceof Error.ValidationError) {
+      if (err instanceof MongooseError.ValidationError) {
         next(new ValidationError('Переданы некорректные данные'))
       } else {
         next(err)
@@ -136,10 +136,10 @@ export const updateUserAvatar = (
       res.send(user)
     })
     .catch((err) => {
-      if (err instanceof Error.CastError) {
+      if (err instanceof MongooseError.CastError) {
         next(new ValidationError('Некорректный тип данных'))
       }
-      if (err instanceof Error.ValidationError) {
+      if (err instanceof MongooseError.ValidationError) {
         next(new ValidationError('Переданы некорректные данные'))
       } else {
         next(err)
