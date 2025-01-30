@@ -38,6 +38,14 @@ const userSchema = new Schema<IUser, UserModel>({
     required: true,
     default:
       'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+    validate: {
+      validator(avatar: string) {
+        const regexp =
+          /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/
+        return regexp.test(avatar)
+      },
+      message: 'Некорректная ссылка на фото профиля',
+    },
   },
   email: {
     type: String,
