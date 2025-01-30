@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { Error } from 'mongoose'
+import { Error as MongooseError } from 'mongoose'
 import Card from '../models/card'
 import { AuthContext } from '../types/types'
 import { NotFoundError } from '../errors/not-found-error'
@@ -22,7 +22,7 @@ export const createCard = (
   })
     .then((card) => res.status(201).send(card))
     .catch((err) => {
-      if (err instanceof Error.ValidationError) {
+      if (err instanceof MongooseError.ValidationError) {
         next(new ValidationError('Переданы некорректные данные'))
       } else {
         next(err)

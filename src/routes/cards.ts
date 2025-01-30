@@ -6,13 +6,17 @@ import {
   getCards,
   likeCard,
 } from '../controllers/cards'
+import {
+  validateCardId,
+  validateCreateCard,
+} from '../constants/request-validators'
 
 const router = Router()
 
 router.get('/', getCards)
-router.post('/', createCard)
-router.delete('/:id', deleteCard)
-router.put('/:id/likes', likeCard)
-router.delete('/:id/likes', dislikeCard)
+router.post('/', validateCreateCard, createCard)
+router.delete('/:id', validateCardId, deleteCard)
+router.put('/:id/likes', validateCardId, likeCard)
+router.delete('/:id/likes', validateCardId, dislikeCard)
 
 export default router

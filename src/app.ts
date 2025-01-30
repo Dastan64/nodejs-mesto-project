@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express'
 import mongoose from 'mongoose'
+import { errors } from 'celebrate'
 
 import usersRouter from './routes/users'
 import cardsRouter from './routes/cards'
@@ -10,6 +11,10 @@ import { auth } from './middlewares/auth'
 import { NotFoundError } from './errors/not-found-error'
 
 import { createUser, login } from './controllers/users'
+import {
+  validateCreateUser,
+  validateLogin,
+} from './constants/request-validators'
 
 const { PORT = 3000 } = process.env
 
@@ -23,8 +28,8 @@ mongoose
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err))
 
-app.post('/signin', login)
-app.post('/signup', createUser)
+app.post('/signin', validateLogin, login)
+app.post('/signup', validateCreateUser, createUser)
 
 app.use(auth)
 
@@ -35,6 +40,7 @@ app.use((_req: Request, _res: Response, next: NextFunction) => {
   next(new NotFoundError('Маршрут не найден'))
 })
 
+app.use(errors())
 app.use(handleError)
 
 app.listen(PORT, () => {

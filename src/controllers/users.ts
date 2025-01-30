@@ -7,8 +7,9 @@ import { NotFoundError } from '../errors/not-found-error'
 import { ValidationError } from '../errors/validation-error'
 import { AuthContext } from '../types/types'
 import { AuthError } from '../errors/auth-error'
-import { ErrorCodes, MONGO_DUPLICATE_ERROR } from '../constants/errors'
+import { MONGO_DUPLICATE_ERROR } from '../constants/errors'
 import { ConflictError } from '../errors/conflict-error'
+import { UnauthorizedError } from '../errors/unauthorized-error'
 
 export const getUsers = (_req: Request, res: Response, next: NextFunction) =>
   User.find({})
@@ -33,7 +34,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
     })
     .catch((err: unknown) => {
       if (err instanceof AuthError) {
-        res.status(ErrorCodes.NOT_AUTHORIZED).send({ message: err.message })
+        next(new UnauthorizedError(err.message))
       } else {
         next(err)
       }
