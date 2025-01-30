@@ -1,9 +1,8 @@
 import { Router } from 'express'
 import {
-  createUser,
+  getCurrentUser,
   getUserById,
   getUsers,
-  login,
   updateUserAvatar,
   updateUserInfo,
 } from '../controllers/users'
@@ -11,9 +10,8 @@ import {
 const router = Router()
 
 router.get('/', getUsers)
+router.get('/me', getCurrentUser)
 router.get('/:id', getUserById)
-router.post('/signin', login)
-router.post('/signup', createUser)
 router.patch('/me', updateUserInfo)
 router.patch('/me/avatar', updateUserAvatar)
 

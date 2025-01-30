@@ -1,5 +1,5 @@
 import { Document, Model, model, Schema } from 'mongoose'
-import isEmail from 'validator/es/lib/isEmail'
+import isEmail from 'validator/lib/isEmail'
 import bcrypt from 'bcrypt'
 import { AuthError } from '../errors/auth-error'
 

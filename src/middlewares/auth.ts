@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
-import { ErrorCodes } from '../constants/errors'
 import { AuthContext } from '../types/types'
+import { AuthError } from '../errors/auth-error'
 
 export const auth = (
   req: Request,
@@ -11,9 +11,7 @@ export const auth = (
   const { authorization } = req.headers
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return res
-      .status(ErrorCodes.NOT_AUTHORIZED)
-      .send({ message: 'Необходима авторизация' })
+    return next(new AuthError('Необходима авторизация'))
   }
 
   const token = authorization.replace('Bearer ', '')
@@ -22,9 +20,7 @@ export const auth = (
   try {
     payload = jwt.verify(token, 'secret-key')
   } catch {
-    return res
-      .status(ErrorCodes.NOT_AUTHORIZED)
-      .send({ message: 'Необходима авторизация' })
+    return next(new AuthError('Необходима авторизация'))
   }
   res.locals.user = payload as { _id: string }
 

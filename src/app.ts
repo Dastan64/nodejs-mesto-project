@@ -3,10 +3,13 @@ import mongoose from 'mongoose'
 
 import usersRouter from './routes/users'
 import cardsRouter from './routes/cards'
-import addUserId from './middlewares/addUserId'
+
 import { handleError } from './middlewares/handleError'
-import { NotFoundError } from './errors/not-found-error'
 import { auth } from './middlewares/auth'
+
+import { NotFoundError } from './errors/not-found-error'
+
+import { createUser, login } from './controllers/users'
 
 const { PORT = 3000 } = process.env
 
@@ -20,7 +23,12 @@ mongoose
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err))
 
-app.use(addUserId)
+// app.use(addUserId)
+
+app.post('/signin', login)
+app.post('/signup', createUser)
+
+app.use(auth)
 
 app.use('/users', usersRouter)
 app.use('/cards', cardsRouter)
@@ -29,7 +37,6 @@ app.use((_req: Request, _res: Response, next: NextFunction) => {
   next(new NotFoundError('Маршрут не найден'))
 })
 
-app.use(auth)
 app.use(handleError)
 
 app.listen(PORT, () => {

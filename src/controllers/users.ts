@@ -56,7 +56,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
     .then((user) => res.status(201).send(user))
     .catch((err: unknown) => {
       if (err instanceof Error.ValidationError) {
-        next(new ValidationError('Переданы некорректные данные'))
+        next(new ValidationError(err.message))
       } else if (
         err instanceof Error &&
         err.message.includes(String(MONGO_DUPLICATE_ERROR))
@@ -145,4 +145,21 @@ export const updateUserAvatar = (
         next(err)
       }
     })
+}
+
+export const getCurrentUser = (
+  _req: Request,
+  res: Response<unknown, AuthContext>,
+  next: NextFunction,
+) => {
+  const userId = res.locals.user._id
+
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Пользователь не найден')
+      }
+      res.send(user)
+    })
+    .catch(next)
 }
