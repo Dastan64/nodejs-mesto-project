@@ -23,8 +23,6 @@ mongoose
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err))
 
-// app.use(addUserId)
-
 app.post('/signin', login)
 app.post('/signup', createUser)
 
