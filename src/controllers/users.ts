@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { Error as MongooseError } from 'mongoose'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
 import User from '../models/user'
 import { NotFoundError } from '../errors/not-found-error'
 import { ValidationError } from '../errors/validation-error'
@@ -10,6 +11,9 @@ import { AuthError } from '../errors/auth-error'
 import { MONGO_DUPLICATE_ERROR } from '../constants/errors'
 import { ConflictError } from '../errors/conflict-error'
 import { UnauthorizedError } from '../errors/unauthorized-error'
+
+dotenv.config()
+const { NODE_ENV, JWT_SECRET } = process.env
 
 export const getUsers = (_req: Request, res: Response, next: NextFunction) =>
   User.find({})
@@ -21,9 +25,13 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'secret-key', {
-        expiresIn: '7d',
-      })
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET! : 'secret-key',
+        {
+          expiresIn: '7d',
+        },
+      )
       res
         .cookie('jwt', token, {
           maxAge: 10800000,

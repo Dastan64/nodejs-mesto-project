@@ -1,4 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express'
+import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import { errors } from 'celebrate'
 
@@ -12,10 +13,13 @@ import { errorLogger, requestLogger } from './middlewares/logger'
 import { NotFoundError } from './errors/not-found-error'
 
 import { createUser, login } from './controllers/users'
+
 import {
   validateCreateUser,
   validateLogin,
 } from './constants/request-validators'
+
+dotenv.config()
 
 const { PORT = 3000 } = process.env
 
