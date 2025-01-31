@@ -18,6 +18,14 @@ const cardSchema = new Schema<Card>({
   link: {
     type: String,
     required: true,
+    validate: {
+      validator(link: string) {
+        const regexp =
+          /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/
+        return regexp.test(link)
+      },
+      message: 'Некорректная ссылка',
+    },
   },
   owner: {
     type: Schema.Types.ObjectId,

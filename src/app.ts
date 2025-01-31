@@ -7,6 +7,7 @@ import cardsRouter from './routes/cards'
 
 import { handleError } from './middlewares/handleError'
 import { auth } from './middlewares/auth'
+import { errorLogger, requestLogger } from './middlewares/logger'
 
 import { NotFoundError } from './errors/not-found-error'
 
@@ -28,6 +29,8 @@ mongoose
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err))
 
+app.use(requestLogger)
+
 app.post('/signin', validateLogin, login)
 app.post('/signup', validateCreateUser, createUser)
 
@@ -40,6 +43,7 @@ app.use((_req: Request, _res: Response, next: NextFunction) => {
   next(new NotFoundError('Маршрут не найден'))
 })
 
+app.use(errorLogger)
 app.use(errors())
 app.use(handleError)
 
