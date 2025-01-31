@@ -8,6 +8,7 @@ import { ForbiddenError } from '../errors/forbidden-error'
 
 export const getCards = (_req: Request, res: Response, next: NextFunction) =>
   Card.find({})
+    .populate('owner')
     .then((cards) => res.send(cards))
     .catch(next)
 
