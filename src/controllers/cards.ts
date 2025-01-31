@@ -4,6 +4,7 @@ import Card from '../models/card'
 import { AuthContext } from '../types/types'
 import { NotFoundError } from '../errors/not-found-error'
 import { ValidationError } from '../errors/validation-error'
+import { ForbiddenError } from '../errors/forbidden-error'
 
 export const getCards = (_req: Request, res: Response, next: NextFunction) =>
   Card.find({})
@@ -30,14 +31,26 @@ export const createCard = (
     })
 }
 
-export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
-  Card.findByIdAndDelete(req.params.id)
+export const deleteCard = (
+  req: Request,
+  res: Response<unknown, AuthContext>,
+  next: NextFunction,
+) => {
+  const userId = res.locals.user._id
+
+  Card.findById(req.params.id)
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Карточка не найдена')
       }
-      res.status(200).send(card)
+
+      if (card.owner.toString() !== userId) {
+        throw new ForbiddenError('Нельзя удалить чужую карточку')
+      }
+
+      return Card.findByIdAndDelete(req.params.id)
     })
+    .then((deletedCard) => res.status(200).send(deletedCard))
     .catch(next)
 }
 

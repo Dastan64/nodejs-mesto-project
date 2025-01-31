@@ -3,6 +3,7 @@ export enum ErrorCodes {
   VALIDATION_ERROR = 400,
   SERVER_ERROR = 500,
   NOT_AUTHORIZED = 401,
+  FORBIDDEN = 403,
   CONFLICT = 409,
 }
 
