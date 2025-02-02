@@ -9,9 +9,9 @@ export const validateLogin = celebrate({
 
 export const validateCreateUser = celebrate({
   [Segments.BODY]: Joi.object({
-    name: Joi.string().required().min(2).max(30),
-    about: Joi.string().required().min(2).max(30),
-    avatar: Joi.string().required(),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().uri(),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
@@ -23,9 +23,17 @@ export const validateUserId = celebrate({
   }),
 })
 
+export const validateUserUpdate = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().uri(),
+  }),
+})
+
 export const validateAvatarUpdate = celebrate({
   [Segments.BODY]: Joi.object({
-    avatar: Joi.string().required(),
+    avatar: Joi.string().required().uri(),
   }),
 })
 
@@ -33,7 +41,7 @@ export const validateCreateCard = celebrate({
   [Segments.BODY]: Joi.object()
     .keys({
       name: Joi.string().required().min(2).max(30),
-      link: Joi.string().required(),
+      link: Joi.string().required().uri(),
     })
     .unknown(true),
 })

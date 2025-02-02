@@ -62,6 +62,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
         password: hash,
       }),
     )
+    .then((user) => User.findById(user._id).select('-password'))
     .then((user) => res.status(201).send(user))
     .catch((err: unknown) => {
       if (err instanceof MongooseError.ValidationError) {

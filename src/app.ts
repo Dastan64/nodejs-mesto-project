@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express'
 import dotenv from 'dotenv'
+import cookieParser from 'cookie-parser'
 import mongoose from 'mongoose'
 import { errors } from 'celebrate'
 
@@ -26,6 +27,7 @@ const { PORT = 3000 } = process.env
 const app = express()
 
 app.use(express.json())
+app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }))
 
 mongoose
